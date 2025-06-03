@@ -107,7 +107,7 @@
       <input name="name" required>
 
       <label>Age</label>
-      <input type="number" name="age" required>
+      <input type="number" name="age" min="0" max="120" required>
 
       <label>Gender</label>
       <select name="gender" required>
@@ -135,20 +135,20 @@
 
       <hr style="margin: 20px 0;">
 
-      <label>Hemoglobin</label>
-      <input name="hb" required>
+      <label>Hemoglobin (g/dL)</label>
+      <input name="hb" type="number" min="5" max="20" step="0.1" title="Enter between 5 - 20 g/dL" required>
 
-      <label>WBC</label>
-      <input name="wbc" required>
+      <label>WBC (×10³/µL)</label>
+      <input name="wbc" type="number" min="1" max="30" step="0.1" title="Enter between 1 - 30 ×10³/µL" required>
 
-      <label>Platelets</label>
-      <input name="platelets" required>
+      <label>Platelets (×10³/µL)</label>
+      <input name="platelets" type="number" min="50" max="1000" step="1" title="Enter between 50 - 1000 ×10³/µL" required>
 
-      <label>Glucose</label>
-      <input name="glucose" required>
+      <label>Glucose (mg/dL)</label>
+      <input name="glucose" type="number" min="40" max="400" step="1" title="Enter between 40 - 400 mg/dL" required>
 
-      <label>Cholesterol</label>
-      <input name="cholesterol" required>
+      <label>Cholesterol (mg/dL)</label>
+      <input name="cholesterol" type="number" min="75" max="400" step="1" title="Enter between 75 - 400 mg/dL" required>
 
       <button type="submit">Generate QR</button>
     </form>
@@ -158,48 +158,47 @@
   </div>
 
   <script>
-    const form = document.getElementById('reportForm');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const qrContainer = document.getElementById('qrcode');
-    let canvasRef = null;
+  const form = document.getElementById('reportForm');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const qrContainer = document.getElementById('qrcode');
 
-    form.onsubmit = (e) => {
-      e.preventDefault();
+  form.onsubmit = (e) => {
+    e.preventDefault();
 
-      const data = Object.fromEntries(new FormData(form).entries());
-      const json = JSON.stringify(data);
-      const base64 = btoa(json);
+    const data = Object.fromEntries(new FormData(form).entries());
+    const json = JSON.stringify(data);
+    const base64 = btoa(json);
 
-      const url = `https://rajrishu1401.github.io/blood-report-qr/report.html?data=${base64}`;
+    const url = `https://rajrishu1401.github.io/blood-report-qr/report.html?data=${base64}`;
 
-      qrContainer.innerHTML = '';
-      canvasRef = document.createElement('canvas');
-      qrContainer.appendChild(canvasRef);
+    qrContainer.innerHTML = ''; // Clear old QR
 
-      new QRCode(canvasRef, {
-        text: url,
-        width: 256,
-        height: 256,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
+    new QRCode(qrContainer, {
+      text: url,
+      width: 256,
+      height: 256,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
 
-      downloadBtn.style.display = 'inline-block';
-    };
+    downloadBtn.style.display = 'inline-block';
+  };
 
-    downloadBtn.onclick = () => {
-      if (!canvasRef) {
-        alert("Please generate the QR code first.");
-        return;
-      }
+  downloadBtn.onclick = () => {
+    const qrImg = qrContainer.querySelector('img');
+    if (!qrImg) {
+      alert("Please generate the QR code first.");
+      return;
+    }
 
-      const link = document.createElement("a");
-      link.download = "blood-report-qr.png";
-      link.href = canvasRef.toDataURL("image/png");
-      link.click();
-    };
-  </script>
+    const link = document.createElement("a");
+    link.download = "blood-report-qr.png";
+    link.href = qrImg.src;
+    link.click();
+  };
+</script>
+
 
 </body>
 </html>
