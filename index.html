@@ -1,78 +1,166 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Blood Report QR Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
+      font-family: 'Inter', sans-serif;
+      background-color: #f2f4f8;
+      margin: 0;
+      padding: 40px 10px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
     }
-    input, select {
-      margin-bottom: 10px;
-      display: block;
+
+    .container {
+      background-color: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      max-width: 600px;
+      width: 100%;
     }
-    #downloadBtn {
-      display: none;
+
+    h2 {
+      margin-top: 0;
+      text-align: center;
+      color: #333;
+    }
+
+    form label {
+      font-weight: 600;
       margin-top: 10px;
-      padding: 6px 12px;
+      display: block;
+      color: #444;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button[type="submit"] {
+      width: 100%;
       background-color: #007BFF;
       color: white;
+      padding: 12px;
+      font-size: 16px;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
+      margin-top: 10px;
     }
-    #downloadBtn:hover {
+
+    button[type="submit"]:hover {
       background-color: #0056b3;
     }
+
+    #downloadBtn {
+      display: none;
+      width: 100%;
+      margin-top: 20px;
+      padding: 10px 12px;
+      background-color: #28a745;
+      color: white;
+      font-size: 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #downloadBtn:hover {
+      background-color: #1e7e34;
+    }
+
+    #qrcode {
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+    }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
-  <h2>Enter Blood Test Data</h2>
-  <form id="reportForm">
-    <strong>Personal Information</strong><br>
-    Name: <input name="name" required><br>
-    Age: <input type="number" name="age" required><br>
-    Gender:
-    <select name="gender" required>
-      <option value="">Select</option>
-      <option>Male</option>
-      <option>Female</option>
-      <option>Other</option>
-    </select><br>
-    Blood Group:
-    <select name="bloodGroup" required>
-      <option value="">Select</option>
-      <option>A+</option>
-      <option>A-</option>
-      <option>B+</option>
-      <option>B-</option>
-      <option>AB+</option>
-      <option>AB-</option>
-      <option>O+</option>
-      <option>O-</option>
-    </select><br>
-    Date of Test: <input type="date" name="testDate" required><br>
+  <div class="container">
+    <h2>Blood Report QR Generator</h2>
+    <form id="reportForm">
+      <label>Name</label>
+      <input name="name" required>
 
-    <strong>Blood Test Values</strong><br>
-    Hemoglobin: <input name="hb" required><br>
-    WBC: <input name="wbc" required><br>
-    Platelets: <input name="platelets" required><br>
-    Glucose: <input name="glucose" required><br>
-    Cholesterol: <input name="cholesterol" required><br>
+      <label>Age</label>
+      <input type="number" name="age" required>
 
-    <button type="submit">Generate QR</button>
-  </form>
+      <label>Gender</label>
+      <select name="gender" required>
+        <option value="">Select</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
 
-  <div id="qrcode" style="margin-top: 20px;"></div>
-  <button id="downloadBtn">Download QR</button>
+      <label>Blood Group</label>
+      <select name="bloodGroup" required>
+        <option value="">Select</option>
+        <option>A+</option>
+        <option>A-</option>
+        <option>B+</option>
+        <option>B-</option>
+        <option>AB+</option>
+        <option>AB-</option>
+        <option>O+</option>
+        <option>O-</option>
+      </select>
+
+      <label>Date of Test</label>
+      <input type="date" name="testDate" required>
+
+      <hr style="margin: 20px 0;">
+
+      <label>Hemoglobin</label>
+      <input name="hb" required>
+
+      <label>WBC</label>
+      <input name="wbc" required>
+
+      <label>Platelets</label>
+      <input name="platelets" required>
+
+      <label>Glucose</label>
+      <input name="glucose" required>
+
+      <label>Cholesterol</label>
+      <input name="cholesterol" required>
+
+      <button type="submit">Generate QR</button>
+    </form>
+
+    <div id="qrcode"></div>
+    <button id="downloadBtn">Download QR</button>
+  </div>
 
   <script>
     const form = document.getElementById('reportForm');
     const downloadBtn = document.getElementById('downloadBtn');
     const qrContainer = document.getElementById('qrcode');
-
     let canvasRef = null;
 
     form.onsubmit = (e) => {
@@ -82,21 +170,19 @@
       const json = JSON.stringify(data);
       const base64 = btoa(json);
 
-      // Your live report URL
       const url = `https://rajrishu1401.github.io/blood-report-qr/report.html?data=${base64}`;
 
-      qrContainer.innerHTML = ''; // Clear any old QR
+      qrContainer.innerHTML = '';
       canvasRef = document.createElement('canvas');
       qrContainer.appendChild(canvasRef);
 
-      // Use QRCode library to draw on canvas
       new QRCode(canvasRef, {
         text: url,
-        width: 256, // You can increase this for higher resolution
+        width: 256,
         height: 256,
-        colorDark : "#000000",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
       });
 
       downloadBtn.style.display = 'inline-block';

@@ -27,6 +27,33 @@
       display: inline-block;
       width: 150px;
     }
+    .status {
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 10px;
+    }
+    .normal {
+      color: #155724;
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+    }
+    .high {
+      color: #721c24;
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+    }
+    .low {
+      color: #856404;
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+    }
+    .difference {
+      font-style: italic;
+      font-size: 0.9em;
+      margin-left: 5px;
+      color: #555;
+    }
   </style>
 </head>
 <body>
@@ -45,11 +72,11 @@
 
     <div class="section">
       <h3>Blood Test Values</h3>
-      <p><span class="label">Hemoglobin:</span> <span id="hb"></span></p>
-      <p><span class="label">WBC:</span> <span id="wbc"></span></p>
-      <p><span class="label">Platelets:</span> <span id="platelets"></span></p>
-      <p><span class="label">Glucose:</span> <span id="glucose"></span></p>
-      <p><span class="label">Cholesterol:</span> <span id="cholesterol"></span></p>
+      <p><span class="label">Hemoglobin (g/dL):</span> <span id="hb"></span> <span id="hb-status"></span></p>
+      <p><span class="label">WBC (10³/µL):</span> <span id="wbc"></span> <span id="wbc-status"></span></p>
+      <p><span class="label">Platelets (10³/µL):</span> <span id="platelets"></span> <span id="platelets-status"></span></p>
+      <p><span class="label">Glucose (mg/dL):</span> <span id="glucose"></span> <span id="glucose-status"></span></p>
+      <p><span class="label">Cholesterol (mg/dL):</span> <span id="cholesterol"></span> <span id="cholesterol-status"></span></p>
     </div>
   </div>
 
@@ -59,11 +86,72 @@
       return urlParams.get(name);
     }
 
+    function createStatusElement(status, rangeText, diff) {
+      const span = document.createElement("span");
+      span.className = 'status ' + status;
+
+      let diffText = '';
+      if(diff !== 0) {
+        diffText = diff > 0 
+          ? `(+${diff.toFixed(2)}) above` 
+          : `(${diff.toFixed(2)}) below`;
+      }
+
+      span.textContent = `${status.charAt(0).toUpperCase() + status.slice(1)} (Norm: ${rangeText})`;
+      
+      if(diffText) {
+        const diffSpan = document.createElement("span");
+        diffSpan.className = "difference";
+        diffSpan.textContent = diffText;
+        span.appendChild(diffSpan);
+      }
+      return span;
+    }
+
+    // Normal ranges for adults (example values, may vary by lab):
+    // Hemoglobin: 13.8 - 17.2 g/dL (men), 12.1 - 15.1 g/dL (women) - Here, we'll just take 13.5 - 17.5 as a general range
+    // WBC: 4.5 - 11.0 x10^3/µL
+    // Platelets: 150 - 450 x10^3/µL
+    // Glucose (fasting): 70 - 100 mg/dL
+    // Cholesterol (total): Less than 200 mg/dL (let's say 125 - 200 as normal)
+    const normalRanges = {
+      hb: { min: 13.5, max: 17.5 },
+      wbc: { min: 4.5, max: 11.0 },
+      platelets: { min: 150, max: 450 },
+      glucose: { min: 70, max: 100 },
+      cholesterol: { min: 125, max: 200 }
+    };
+
+    function evaluateValue(key, value) {
+      const range = normalRanges[key];
+      if (!range || isNaN(value)) return null;
+
+      if (value < range.min) {
+        return { status: 'low', diff: range.min - value, rangeText: `${range.min} - ${range.max}` };
+      } else if (value > range.max) {
+        return { status: 'high', diff: value - range.max, rangeText: `${range.min} - ${range.max}` };
+      } else {
+        return { status: 'normal', diff: 0, rangeText: `${range.min} - ${range.max}` };
+      }
+    }
+
     function displayReport(data) {
       for (const key in data) {
         const el = document.getElementById(key);
         if (el) {
           el.textContent = data[key];
+          // If key is a blood test value, evaluate and display status
+          if (normalRanges.hasOwnProperty(key)) {
+            const val = parseFloat(data[key]);
+            const result = evaluateValue(key, val);
+            if(result) {
+              const statusEl = document.getElementById(key + "-status");
+              if (statusEl) {
+                const statusSpan = createStatusElement(result.status, result.rangeText, result.diff);
+                statusEl.appendChild(statusSpan);
+              }
+            }
+          }
         }
       }
     }
