@@ -73,6 +73,8 @@
     const downloadBtn = document.getElementById('downloadBtn');
     const qrContainer = document.getElementById('qrcode');
 
+    let canvasRef = null;
+
     form.onsubmit = (e) => {
       e.preventDefault();
 
@@ -80,25 +82,36 @@
       const json = JSON.stringify(data);
       const base64 = btoa(json);
 
-      // Replace this with your actual domain if hosted online
+      // Your live report URL
       const url = `https://rajrishu1401.github.io/blood-report-qr/report.html?data=${base64}`;
 
-      qrContainer.innerHTML = '';
-      new QRCode(qrContainer, url);
+      qrContainer.innerHTML = ''; // Clear any old QR
+      canvasRef = document.createElement('canvas');
+      qrContainer.appendChild(canvasRef);
+
+      // Use QRCode library to draw on canvas
+      new QRCode(canvasRef, {
+        text: url,
+        width: 256, // You can increase this for higher resolution
+        height: 256,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+      });
 
       downloadBtn.style.display = 'inline-block';
     };
 
     downloadBtn.onclick = () => {
-      const qrImg = document.querySelector("#qrcode img");
-      if (qrImg) {
-        const link = document.createElement("a");
-        link.href = qrImg.src;
-        link.download = "blood-report-qr.png";
-        link.click();
-      } else {
+      if (!canvasRef) {
         alert("Please generate the QR code first.");
+        return;
       }
+
+      const link = document.createElement("a");
+      link.download = "blood-report-qr.png";
+      link.href = canvasRef.toDataURL("image/png");
+      link.click();
     };
   </script>
 
