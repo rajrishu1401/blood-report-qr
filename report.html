@@ -127,12 +127,11 @@
       if (!range || isNaN(value)) return null;
 
       if (value < range.min) {
-        return { status: 'low', diff: range.min - value, rangeText: `${range.min} - ${range.max}` };
+        return { status: 'low', diff: value - range.min, rangeText: `${range.min} - ${range.max}` };
       } else if (value > range.max) {
         return { status: 'high', diff: value - range.max, rangeText: `${range.min} - ${range.max}` };
-      } else {
-        return { status: 'normal', diff: 0, rangeText: `${range.min} - ${range.max}` };
       }
+
     }
 
     function displayReport(data) {
