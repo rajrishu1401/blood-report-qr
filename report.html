@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blood Report</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #f9f9f9;
+    }
+    h2 {
+      text-align: center;
+    }
+    .report-container {
+      background: #fff;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .label {
+      font-weight: bold;
+      display: inline-block;
+      width: 150px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="report-container">
+    <h2>Blood Test Report</h2>
+
+    <div class="section">
+      <h3>Personal Information</h3>
+      <p><span class="label">Name:</span> <span id="name"></span></p>
+      <p><span class="label">Age:</span> <span id="age"></span></p>
+      <p><span class="label">Gender:</span> <span id="gender"></span></p>
+      <p><span class="label">Blood Group:</span> <span id="bloodGroup"></span></p>
+      <p><span class="label">Test Date:</span> <span id="testDate"></span></p>
+    </div>
+
+    <div class="section">
+      <h3>Blood Test Values</h3>
+      <p><span class="label">Hemoglobin:</span> <span id="hb"></span></p>
+      <p><span class="label">WBC:</span> <span id="wbc"></span></p>
+      <p><span class="label">Platelets:</span> <span id="platelets"></span></p>
+      <p><span class="label">Glucose:</span> <span id="glucose"></span></p>
+      <p><span class="label">Cholesterol:</span> <span id="cholesterol"></span></p>
+    </div>
+  </div>
+
+  <script>
+    function getQueryParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    function displayReport(data) {
+      for (const key in data) {
+        const el = document.getElementById(key);
+        if (el) {
+          el.textContent = data[key];
+        }
+      }
+    }
+
+    const base64 = getQueryParam("data");
+    if (base64) {
+      try {
+        const json = atob(base64);
+        const data = JSON.parse(json);
+        displayReport(data);
+      } catch (err) {
+        alert("Invalid or corrupted QR code data.");
+      }
+    } else {
+      alert("No data found in QR code.");
+    }
+  </script>
+
+</body>
+</html>
