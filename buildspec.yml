@@ -1,0 +1,12 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo "No build commands needed, just packaging files..."
+
+artifacts:
+  files:
+    - index.html
+    - report.html
+    - appspec.yml
