@@ -10,4 +10,3 @@ artifacts:
     - index.html
     - report.html
     - appspec.yml
-    - scripts/**/*
